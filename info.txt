@@ -1,0 +1,2 @@
+The os module is a part of the standard library, or stdlib, within Python 3. This means that it comes with your Python installation,
+but you still must import it. All of the following code assumes you have os imported. Because it is not a built-in function, you must always import it.
