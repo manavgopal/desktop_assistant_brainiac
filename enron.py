@@ -165,6 +165,21 @@ if __name__ == "__main__":
             # This command will first join the path of music dir to the path od os and then start that file
             os.startfile(os.path.join(music_dir, songs[rand_song]))
 
+        elif "whatsapp message" in query:
+            try:
+                speak("please provide a number to send messege")
+                number = takeCommand()
+                speak("what should i send?")
+                messege = takeCommand()
+                hour = int(datetime.datetime.now().hour)
+                minute = int(datetime.datetime.now().minute)+2
+                # added 2 extra minute to ensure that time does not change in between the process
+                pwk.sendwhatmsg(f"+91{number}", messege, hour, minute, 8)
+                speak("messege is send")
+            except Exception as e:
+                print(e)
+                speak("Sorry could not send the messege")
+
         elif "play" in query:
             playOnYoutube(query)
             exit()
