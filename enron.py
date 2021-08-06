@@ -180,6 +180,13 @@ if __name__ == "__main__":
                 print(e)
                 speak("Sorry could not send the messege")
 
+        elif "search" in query:
+            query = query.replace("search", "")
+            if "on google" in query:
+                query = query.replace("on google", "")
+            pwk.search(query)
+            exit()
+
         elif "play" in query:
             playOnYoutube(query)
             exit()
