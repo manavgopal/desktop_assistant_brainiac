@@ -1,4 +1,4 @@
-import pyttsx3  # Text-to-speeach converter library
+import pyttsx3  # Text-to-speech converter library
 import datetime  # Libraries to deal with date and time
 import speech_recognition as sr # Library for performing speech recognition https://pypi.org/project/SpeechRecognition/
 import wikipedia    # In order to extract data from Wikipedia,  Python Wikipedia library is used, which wraps the official Wikipedia API
@@ -6,6 +6,19 @@ import webbrowser   # The webbrowser module can be used to launch a browser in a
 import os        # The OS module in Python provides functions for creating and removing a directory (folder), fetching its contents, changing and identifying the current directory, etc.
 import smtplib  # The smtplib module defines an SMTP client session object that can be used to send mail to any Internet machine with an SMTP or ESMTP listener daemon
 import random   # For generating any random number
+import pywhatkit as pwk
+import pyjokes
+
+# The Google APIs Client Library for Python:
+# pip install --upgrade google-api-python-client
+# pip install --upgrade google-auth-oauthlib google-auth-httplib2
+
+
+from pyaudio import PyAudio
+import wave
+from speech_recognition import AudioFile
+from apiclient.discovery import build 
+from os import system
 
 # The below code is to set the webBrowser
 # If this piece of code is deleted then the program will automatically open in default web browser
@@ -18,7 +31,7 @@ engine = pyttsx3.init("sapi5") # The pyttsx3 module supports two voices first is
 # espeak – eSpeak on every other platform
 voices = engine.getProperty("voices")   # Get all the voices from the system
 # print(voices[1].id)
-engine.setProperty("voice",voices[0].id)    # Set a particular voice for the engine
+engine.setProperty("voice",voices[1].id)    # Set a particular voice for the engine
 
 # Define a function which will call the engine to speak the parameter passed and then run and wait
 def speak(audio):
@@ -32,13 +45,11 @@ def wishMe():
 
     hour = int(datetime.datetime.now().hour)  # Getting the hour from the date time library
     if hour>=12 and hour<18:
-        speak("Good Afternoon, sir")    
+        speak("Good Afternoon Manab")    
     elif hour<12 and hour>=0:
-        speak("Good Morning, sir")
+        speak("Good Morning Manab")
     else:
-        speak("Good Evening, sir")
-
-    speak("I am brainiac. How may i help you.")
+        speak("Good Evening Manab")
 
 # This function takes microphone input from the user and returns string output
 def takeCommand():
@@ -60,7 +71,7 @@ def takeCommand():
         # speak(query)
     except Exception as e:
         # print(e)
-        speak("Could not understand what you want me to do. could you please say that again.")
+        speak("Could not understand what you want me to do.")
         return "None"
     return query
 
@@ -75,28 +86,83 @@ def sendEmail(to, content):
     # STARTTLS is an email protocol command that tells an email server that an email client, including an email client running in a web browser, wants to turn an existing insecure connection into a secure one.
 
     # It will login to the email given
-    server.login("manavsharma1208@gmail.com","Your-password")
+    server.login("manavsharma1208@gmail.com","<your_pass>")
 
     # here is the email of the sender
     server.sendmail("manavsharma1208@gmail.com",to,content)
     server.close()
+
+    
+def playOnYoutube(query):
+    query = query.replace("on youtube","")
+    if "play" in query:
+        query=query.replace("play","")
+    speak("playing"+query)
+    pwk.playonyt(query)
     
 if __name__ == "__main__":
     wishMe()
     while True:
         
         query = takeCommand().lower() # Takecommand will covenrt the speaked sentence into string
-        #logic for executing tasks based on query
+        # logic for executing tasks based on query
 
-        if "hello" in query:
-            speak("hi sir")
+        if any(s in query for s in ("hi","hello","hey","hay","hai")):
+            speak("hi sir, how are you")
+
+
+        elif "your name" in query:
+            speak("I am Ruby")
+
+        elif "yourself" in query:
+            speak("Sure.. My name is Ruby. I am an AI assistant developed by Manab Gopal.")
+
         elif "wikipedia" in query:
             speak("searching wikipedia....")
-            query=query.replace("wikipedia","")
-            results=wikipedia.summary(query,sentences=2)
+            query = query.replace("wikipedia","")
+            results = wikipedia.summary(query,sentences=2)
             speak("According to wikipedia..")
             print(results)
             speak(results)
+
+        elif "whatsapp message" in query:
+            try:
+                speak("please provide a number to send messege")
+                number = takeCommand()
+                speak("what should i send?")
+                messege = takeCommand()
+                hour = int(datetime.datetime.now().hour)
+                minute = int(datetime.datetime.now().minute)+2
+                # added 2 extra minute to ensure that time does not change in between the process
+                pwk.sendwhatmsg(f"+91{number}",messege,hour,minute,8)
+                speak("messege is send")
+            except Exception as e:
+                print(e)
+                speak("Sorry could not send the messege")
+
+        elif "search" in query:
+            query = query.replace("search","")
+            if "on google" in query:
+                query = query.replace("on google","")
+            pwk.search(query)
+            exit()
+
+        elif "on youtube" in query:
+            playOnYoutube(query)
+            exit()
+
+        elif "play music" in query:
+            speak("here is the song for you...sir")
+            music_dir="C:\\Users\\manav\\OneDrive\\Desktop\\my music"  #Specifing the directory address in which musics are kept
+            songs = os.listdir(music_dir)    # This command will list all the music from the music directory provided
+            #Further Use a loop to generate a random song
+            # print(songs)
+            rand_song=random.randint(0,len(songs)-1)    # This willcreate a random songs number from all the songs
+            os.startfile(os.path.join(music_dir,songs[rand_song]))     # This command will first join the path of music dir to the path od os and then start that file 
+
+        elif "play" in query:
+            playOnYoutube(query)
+            exit()
 
         elif "open youtube" in query:
             speak("sure sir, Opening youtube")
@@ -118,22 +184,32 @@ if __name__ == "__main__":
             speak("sure sir, opening instagram")
             webbrowser.open("instagram.com")
 
-        elif "play music" in query:
-            speak("here is the song for you...sir")
-            music_dir="C:\\Users\\manav\\OneDrive\\Desktop\\my music"  #Specifing the directory address in which musics are kept
-            songs = os.listdir(music_dir)    # This command will list all the music from the music directory provided
-            #Further Use a loop to generate a random song
-            # print(songs)
-            rand_song=random.randint(0,len(songs)-1)    # This willcreate a random songs number from all the songs
-            os.startfile(os.path.join(music_dir,songs[rand_song]))     # This command will first join the path of music dir to the path od os and then start that file 
-
-        elif "the time" in query:
+        elif "time" in query:
             strTime = datetime.datetime.now().strftime("%H:%M:%S") # This will fetch the current time from datetime library
             speak(f"Sir, the time is {strTime}")    # It will speak the current time
+            print("the time is - "+strTime)
 
-        elif "open code" in query:
+        elif "joke" in query:
+            My_joke = pyjokes.get_joke(language="en", category="neutral")
+            print(My_joke)
+            speak(My_joke)
+
+        # elif "write" in query:
+        #     speak("please say what should i write")
+        #     writing = takeCommand()
+        #     pwk.text_to_handwriting(writing,"C:\Users\manav\OneDrive\Desktop/test.png)
+
+        elif "tell me" in query:
+            query = query.replace("tell me","")
+            if "about" in query:
+                query = query.replace("about","")
+            speak(f"sure sir, here is what i found about {query}") 
+            pwk.info(query)
+
+        elif "open vs code" in query:
             codePath = "E:\\Microsoft VS Code\\Code.exe"       # Specifying the path of vscode
             os.startfile(codePath)  
+
         elif "email to manav" in query:
             #make a dictonary with key=name and value=emailid
             try:
@@ -149,7 +225,7 @@ if __name__ == "__main__":
                 #speak("Do you want me to retry")
                 # ans = takeCommand()
                 # make a while loop and if the ans="no" then break the loop
-        elif "quit" in query:
+        elif "shutdown" in query:
             speak("Ok sir...,have a nice day.....,shutting down")
             exit()
 
