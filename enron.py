@@ -107,7 +107,7 @@ def sendEmail(to, content):
     # STARTTLS is an email protocol command that tells an email server that an email client, including an email client running in a web browser, wants to turn an existing insecure connection into a secure one.
 
     # It will login to the email given
-    server.login("manavsharma1208@gmail.com", "Gopal13@")
+    server.login("manavsharma1208@gmail.com", "<your_pass>")
 
     # here is the email of the sender
     server.sendmail("manavsharma1208@gmail.com", to, content)
